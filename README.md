@@ -16,6 +16,7 @@ cd ~/.dotfiles
 
 ## 管理ツール
 - **ターミナル**: [Ghostty](docs/ghostty.md) - 高速で現代的なターミナルエミュレータ
+- **プロンプト**: [Starship](docs/starship.md) - 高速でカスタマイズ可能なプロンプト
 
 ## ファイル構成
 
@@ -23,6 +24,8 @@ cd ~/.dotfiles
 dotfiles/
 ├── ghostty/
 │   └── config          # Ghostty設定ファイル
+├── starship/
+│   └── starship.toml   # Starship設定ファイル
 ├── docs/               # ドキュメント
 ├── install.sh          # セットアップスクリプト
 └── README.md
