@@ -1,0 +1,25 @@
+# Ghostty Configuration
+# このファイルは ~/.config/ghostty/config にシンボリックリンクを作成してください
+
+# テーマ設定
+theme = nord
+
+# macOS固有設定
+macos-titlebar-proxy-icon = hidden
+
+# ウィンドウ設定
+window-save-state = always
+fullscreen = true
+window-inherit-working-directory = true
+
+# リサイズオーバーレイ設定
+resize-overlay = never
+
+# フォント設定（推奨）
+font-family = "JetBrains Mono"
+font-size = 13
+
+# その他の推奨設定
+scrollback-limit = 50000
+window-padding-x = 8
+window-padding-y = 8 
