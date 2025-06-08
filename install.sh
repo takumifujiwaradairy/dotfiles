@@ -67,6 +67,19 @@ fi
 ln -sf "${DOTFILES_DIR}/fzf/fzfrc" ~/.config/fzfrc
 echo "✅ Fzf設定ファイルをリンクしました: ~/.config/fzfrc"
 
+# Claude Code設定のセットアップ
+echo "🤖 Claude Code設定をセットアップしています..."
+
+# 既存の設定ファイルがある場合はバックアップ
+if [ -f ~/.config/clauderc ]; then
+    echo "⚠️  既存のClaude Code設定をバックアップします..."
+    mv ~/.config/clauderc ~/.config/clauderc.backup.$(date +%Y%m%d_%H%M%S)
+fi
+
+# シンボリックリンクを作成
+ln -sf "${DOTFILES_DIR}/claude/clauderc" ~/.config/clauderc
+echo "✅ Claude Code設定ファイルをリンクしました: ~/.config/clauderc"
+
 echo "🎉 dotfilesのセットアップが完了しました！"
 echo ""
 echo "📋 セットアップされた設定:"
@@ -74,18 +87,23 @@ echo "   • Ghostty: ~/.config/ghostty/config"
 echo "   • Starship: ~/.config/starship.toml" 
 echo "   • Tmux: ~/.tmux.conf"
 echo "   • Fzf: ~/.config/fzfrc"
+echo "   • Claude Code: ~/.config/clauderc"
 echo ""
 echo "💡 次の手順を実行してください:"
 echo "   1. 必要なツールをインストール:"
 echo "      brew install tmux fzf bat ripgrep fd tree"
+echo "      npm install -g @anthropic-ai/claude-code"
 echo "   2. Ghosttyを再起動して設定を反映"
 echo "   3. シェルプロファイル（~/.zshrc）に以下を追加:"
 echo "      eval \"\$(starship init zsh)\""
 echo "      source ~/.config/fzfrc"
+echo "      source ~/.config/clauderc"
 echo "      [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh"
 echo "   4. Tmuxプラグインマネージャー（TPM）をインストール:"
 echo "      git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
 echo "   5. Fzfシェル統合をセットアップ:"
 echo "      \$(brew --prefix)/opt/fzf/install"
-echo "   6. 新しいターミナルセッションを開始"
-echo "   7. Tmuxを起動してプラグインをインストール（Ctrl+a + I）"
+echo "   6. Claude Codeの認証設定:"
+echo "      claude"
+echo "   7. 新しいターミナルセッションを開始"
+echo "   8. Tmuxを起動してプラグインをインストール（Ctrl+a + I）"

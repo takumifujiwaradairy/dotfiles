@@ -19,6 +19,7 @@ cd ~/.dotfiles
 - **プロンプト**: [Starship](docs/starship.md) - 高速でカスタマイズ可能なプロンプト
 - **マルチプレクサー**: [Tmux](docs/tmux.md) - 端末マルチプレクサー
 - **ファジーファインダー**: [fzf](docs/fzf.md) - 高速ファイル・履歴検索
+- **AI開発支援**: [Claude Code](docs/claude.md) - AI駆動のコード生成・分析
 
 ## ファイル構成
 
@@ -32,6 +33,8 @@ dotfiles/
 │   └── tmux.conf       # Tmux設定ファイル
 ├── fzf/
 │   └── fzfrc           # fzf設定ファイル
+├── claude/
+│   └── clauderc        # Claude Code設定ファイル
 ├── docs/               # ドキュメント
 ├── install.sh          # セットアップスクリプト
 └── README.md
