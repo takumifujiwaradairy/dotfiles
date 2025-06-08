@@ -18,6 +18,7 @@ cd ~/.dotfiles
 - **ターミナル**: [Ghostty](docs/ghostty.md) - 高速で現代的なターミナルエミュレータ
 - **プロンプト**: [Starship](docs/starship.md) - 高速でカスタマイズ可能なプロンプト
 - **マルチプレクサー**: [Tmux](docs/tmux.md) - 端末マルチプレクサー
+- **ファジーファインダー**: [fzf](docs/fzf.md) - 高速ファイル・履歴検索
 
 ## ファイル構成
 
@@ -29,6 +30,8 @@ dotfiles/
 │   └── starship.toml   # Starship設定ファイル
 ├── tmux/
 │   └── tmux.conf       # Tmux設定ファイル
+├── fzf/
+│   └── fzfrc           # fzf設定ファイル
 ├── docs/               # ドキュメント
 ├── install.sh          # セットアップスクリプト
 └── README.md

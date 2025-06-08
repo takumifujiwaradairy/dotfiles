@@ -1,0 +1,147 @@
+# fzf設定ファイル
+
+# 基本設定
+export FZF_DEFAULT_OPTS="
+  --height 50%
+  --layout=reverse
+  --border
+  --preview-window=right:60%
+  --bind='ctrl-/:toggle-preview'
+  --bind='ctrl-a:select-all'
+  --bind='ctrl-d:deselect-all'
+  --bind='ctrl-t:toggle-all'
+  --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9
+  --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
+  --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6
+  --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
+"
+
+# ripgrepとの連携（ripgrepがインストールされている場合）
+if command -v rg >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
+# fdとの連携（fdがインストールされている場合）
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+fi
+
+# プレビュー設定
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --color=always --style=header,grid --line-range :300 {}'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'
+"
+
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window up:3:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'Press CTRL-Y to copy command into clipboard'
+"
+
+export FZF_ALT_C_OPTS="
+  --preview 'tree -C {} | head -200'
+"
+
+# 便利な関数
+
+# ファイルを検索して編集
+fe() {
+  local files
+  IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+}
+
+# ディレクトリを検索して移動
+fcd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+# プロセスを検索してkill
+fkill() {
+  local pid
+  if [ "$UID" != "0" ]; then
+    pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+  else
+    pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+  fi
+
+  if [ "x$pid" != "x" ]
+  then
+    echo $pid | xargs kill -${1:-9}
+  fi
+}
+
+# Git関連の便利な関数
+
+# Gitブランチを選択してチェックアウト
+fco() {
+  local branches branch
+  branches=$(git --no-pager branch -vv) &&
+  branch=$(echo "$branches" | fzf +m) &&
+  git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
+}
+
+# Gitログを表示
+flog() {
+  git log --graph --color=always \
+      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+      --bind "ctrl-m:execute:
+                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                {}
+FZF-EOF"
+}
+
+# Git差分を表示
+fshow() {
+  git log --graph --color=always \
+      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+      --bind "ctrl-m:execute:
+                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                {}
+FZF-EOF"
+}
+
+# SSH接続先を選択
+fssh() {
+  local host
+  host=$(grep -E '^Host [^*]' ~/.ssh/config | awk '{print $2}' | fzf)
+  [[ -n $host ]] && ssh $host
+}
+
+# Docker関連
+
+# Dockerコンテナを選択して実行
+fdocker() {
+  local container
+  container=$(docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" | fzf --header-lines=1 | awk '{print $1}')
+  [[ -n $container ]] && docker exec -it $container /bin/bash
+}
+
+# 履歴からディレクトリに移動（dirhistory）
+fh() {
+  print -z $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')
+}
+
+# 環境変数を表示
+fenv() {
+  env | fzf
+}
+
+# エイリアス
+alias ff='fe'
+alias fcd='fcd'
+alias fco='fco'
+alias flog='flog'
+alias fshow='fshow' 
