@@ -1,0 +1,38 @@
+[
+  {
+    "key": "y y",
+    "command": "editor.action.clipboardCopyAction"
+  },
+  {
+    "key": "f",
+    "command": "jumpy2.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "<c-n>",
+    "command": "workbench.action.clearEditorHistory",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+d",
+    "command": "-workbench.view.debug",
+    "when": "viewContainer.workbench.view.debug.enabled"
+  },
+  {
+    "key": "ctrl+alt+d",
+    "command": "vim.toggleNormalMode",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\\\r\n"
+    },
+    "when": "terminalFocus"
+  }
+]

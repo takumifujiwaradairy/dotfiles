@@ -1,0 +1,107 @@
+{
+  "vim.easymotion": true,
+  "vim.incsearch": true,
+  "vim.usectrlkeys": true,
+  "vim.hlsearch": true,
+  "vim.leader": "<space>",
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<esc>"]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<leader>", "d"],
+      "after": ["d", "d"]
+    },
+    {
+      "before": ["<C-d>"],
+      "commands": ["scrollPageDown"]
+    }
+  ],
+  "vim.handleKeys": {
+    "<c-a>": false,
+    "<c-f>": false
+  },
+  "files.autoSave": "afterDelay",
+  "workbench.settings.applyToAllProfiles": [
+    "prettier.configPath"
+  ],
+  "workbench.editorLargeFileConfirmation": 2054,
+  "workbench.colorTheme": "Night Owl (No Italics)",
+  "workbench.iconTheme": "vscode-jetbrains-icon-theme-2023-light",
+  "editorjumper.ideConfigurations": [
+    {
+      "name": "IDEA",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "WebStorm",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "PyCharm",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "GoLand",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "CLion",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "PhpStorm",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "RubyMine",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "Rider",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "Android Studio",
+      "isCustom": false,
+      "hidden": false,
+      "commandPath": null
+    },
+    {
+      "name": "Xcode",
+      "commandPath": null,
+      "isCustom": false,
+      "hidden": false
+    }
+  ],
+  "gitlens.ai.model": "gitkraken",
+  "gitlens.ai.gitkraken.model": "gemini:gemini-2.0-flash",
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  }
+}

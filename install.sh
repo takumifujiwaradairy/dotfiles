@@ -7,103 +7,160 @@ set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 dotfiles セットアップを開始します..."
+echo "dotfiles セットアップを開始します..."
 
-# Ghostty設定のセットアップ
-echo "📱 Ghostty設定をセットアップしています..."
+# =============================================================================
+# ヘルパー関数
+# =============================================================================
 
-# ~/.config ディレクトリが存在しない場合は作成
-mkdir -p ~/.config/ghostty
+link_file() {
+    local src="$1"
+    local dest="$2"
+    local name="$3"
 
-# 既存の設定ファイルがある場合はバックアップ
-if [ -f ~/.config/ghostty/config ]; then
-    echo "⚠️  既存のGhostty設定をバックアップします..."
-    mv ~/.config/ghostty/config ~/.config/ghostty/config.backup.$(date +%Y%m%d_%H%M%S)
-fi
+    # 親ディレクトリが存在しない場合は作成
+    mkdir -p "$(dirname "$dest")"
 
-# シンボリックリンクを作成
-ln -sf "${DOTFILES_DIR}/ghostty/config" ~/.config/ghostty/config
-echo "✅ Ghostty設定ファイルをリンクしました: ~/.config/ghostty/config"
+    # 既存の設定ファイルがある場合はバックアップ
+    if [ -f "$dest" ] && [ ! -L "$dest" ]; then
+        echo "  既存の${name}設定をバックアップ: ${dest}.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$dest" "${dest}.backup.$(date +%Y%m%d_%H%M%S)"
+    fi
 
-# Starship設定のセットアップ
-echo "🚀 Starship設定をセットアップしています..."
+    # シンボリックリンクを作成
+    ln -sf "$src" "$dest"
+    echo "  [OK] ${name}: ${dest}"
+}
 
-# 既存の設定ファイルがある場合はバックアップ
-if [ -f ~/.config/starship.toml ]; then
-    echo "⚠️  既存のStarship設定をバックアップします..."
-    mv ~/.config/starship.toml ~/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)
-fi
+# =============================================================================
+# ターミナル・シェル
+# =============================================================================
 
-# シンボリックリンクを作成
-ln -sf "${DOTFILES_DIR}/starship/starship.toml" ~/.config/starship.toml
-echo "✅ Starship設定ファイルをリンクしました: ~/.config/starship.toml"
-
-# Tmux設定のセットアップ
-echo "🖥️  Tmux設定をセットアップしています..."
-
-# 既存の設定ファイルがある場合はバックアップ
-if [ -f ~/.tmux.conf ]; then
-    echo "⚠️  既存のTmux設定をバックアップします..."
-    mv ~/.tmux.conf ~/.tmux.conf.backup.$(date +%Y%m%d_%H%M%S)
-fi
-
-# シンボリックリンクを作成
-ln -sf "${DOTFILES_DIR}/tmux/tmux.conf" ~/.tmux.conf
-echo "✅ Tmux設定ファイルをリンクしました: ~/.tmux.conf"
-
-# Fzf設定のセットアップ
-echo "🔍 Fzf設定をセットアップしています..."
-
-# ~/.config ディレクトリが存在しない場合は作成
-mkdir -p ~/.config
-
-# 既存の設定ファイルがある場合はバックアップ
-if [ -f ~/.config/fzfrc ]; then
-    echo "⚠️  既存のFzf設定をバックアップします..."
-    mv ~/.config/fzfrc ~/.config/fzfrc.backup.$(date +%Y%m%d_%H%M%S)
-fi
-
-# シンボリックリンクを作成
-ln -sf "${DOTFILES_DIR}/fzf/fzfrc" ~/.config/fzfrc
-echo "✅ Fzf設定ファイルをリンクしました: ~/.config/fzfrc"
-
-# Claude Code設定のセットアップ
-echo "🤖 Claude Code設定をセットアップしています..."
-
-# 既存の設定ファイルがある場合はバックアップ
-if [ -f ~/.config/clauderc ]; then
-    echo "⚠️  既存のClaude Code設定をバックアップします..."
-    mv ~/.config/clauderc ~/.config/clauderc.backup.$(date +%Y%m%d_%H%M%S)
-fi
-
-# シンボリックリンクを作成
-ln -sf "${DOTFILES_DIR}/claude/clauderc" ~/.config/clauderc
-echo "✅ Claude Code設定ファイルをリンクしました: ~/.config/clauderc"
-
-echo "🎉 dotfilesのセットアップが完了しました！"
 echo ""
-echo "📋 セットアップされた設定:"
-echo "   • Ghostty: ~/.config/ghostty/config"
-echo "   • Starship: ~/.config/starship.toml" 
-echo "   • Tmux: ~/.tmux.conf"
-echo "   • Fzf: ~/.config/fzfrc"
-echo "   • Claude Code: ~/.config/clauderc"
+echo "--- ターミナル・シェル ---"
+
+link_file "${DOTFILES_DIR}/ghostty/config" \
+    ~/.config/ghostty/config \
+    "Ghostty"
+
+link_file "${DOTFILES_DIR}/starship/starship.toml" \
+    ~/.config/starship.toml \
+    "Starship"
+
+link_file "${DOTFILES_DIR}/tmux/tmux.conf" \
+    ~/.tmux.conf \
+    "Tmux"
+
+link_file "${DOTFILES_DIR}/zsh/.zshrc" \
+    ~/.zshrc \
+    "Zsh (.zshrc)"
+
+link_file "${DOTFILES_DIR}/zsh/.zprofile" \
+    ~/.zprofile \
+    "Zsh (.zprofile)"
+
+# =============================================================================
+# ツール設定
+# =============================================================================
+
 echo ""
-echo "💡 次の手順を実行してください:"
-echo "   1. 必要なツールをインストール:"
-echo "      brew install tmux fzf bat ripgrep fd tree"
-echo "      npm install -g @anthropic-ai/claude-code"
-echo "   2. Ghosttyを再起動して設定を反映"
-echo "   3. シェルプロファイル（~/.zshrc）に以下を追加:"
-echo "      eval \"\$(starship init zsh)\""
-echo "      source ~/.config/fzfrc"
-echo "      source ~/.config/clauderc"
-echo "      [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh"
-echo "   4. Tmuxプラグインマネージャー（TPM）をインストール:"
-echo "      git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
-echo "   5. Fzfシェル統合をセットアップ:"
-echo "      \$(brew --prefix)/opt/fzf/install"
-echo "   6. Claude Codeの認証設定:"
-echo "      claude"
-echo "   7. 新しいターミナルセッションを開始"
-echo "   8. Tmuxを起動してプラグインをインストール（Ctrl+a + I）"
+echo "--- ツール設定 ---"
+
+link_file "${DOTFILES_DIR}/fzf/fzfrc" \
+    ~/.config/fzfrc \
+    "fzf"
+
+link_file "${DOTFILES_DIR}/claude/clauderc" \
+    ~/.config/clauderc \
+    "Claude Code"
+
+link_file "${DOTFILES_DIR}/git/.gitconfig" \
+    ~/.gitconfig \
+    "Git"
+
+link_file "${DOTFILES_DIR}/karabiner/karabiner.json" \
+    ~/.config/karabiner/karabiner.json \
+    "Karabiner-Elements"
+
+# =============================================================================
+# エディタ (Cursor)
+# =============================================================================
+
+echo ""
+echo "--- エディタ (Cursor) ---"
+
+CURSOR_USER_DIR="$HOME/Library/Application Support/Cursor/User"
+
+link_file "${DOTFILES_DIR}/cursor/settings.json" \
+    "${CURSOR_USER_DIR}/settings.json" \
+    "Cursor (settings)"
+
+link_file "${DOTFILES_DIR}/cursor/keybindings.json" \
+    "${CURSOR_USER_DIR}/keybindings.json" \
+    "Cursor (keybindings)"
+
+# =============================================================================
+# ショートカットツール
+# =============================================================================
+
+echo ""
+echo "--- ユーティリティ ---"
+
+mkdir -p ~/.local/bin
+link_file "${DOTFILES_DIR}/shortcuts/keys.sh" \
+    ~/.local/bin/keys \
+    "Shortcuts (keys)"
+
+# =============================================================================
+# Homebrew パッケージ（オプション）
+# =============================================================================
+
+echo ""
+echo "--- Homebrew パッケージ ---"
+
+if command -v brew &>/dev/null; then
+    read -p "Brewfileからパッケージをインストールしますか？ [y/N] " answer
+    if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+        echo "  Brewfileからインストール中..."
+        brew bundle --file="${DOTFILES_DIR}/Brewfile"
+        echo "  [OK] Brewfileのインストール完了"
+    else
+        echo "  スキップしました"
+    fi
+else
+    echo "  Homebrewが見つかりません。先にインストールしてください:"
+    echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+fi
+
+# =============================================================================
+# 完了
+# =============================================================================
+
+echo ""
+echo "========================================="
+echo " セットアップ完了"
+echo "========================================="
+echo ""
+echo "セットアップされた設定:"
+echo "  [シンボリックリンク]"
+echo "    Ghostty      ~/.config/ghostty/config"
+echo "    Starship      ~/.config/starship.toml"
+echo "    Tmux          ~/.tmux.conf"
+echo "    Zsh           ~/.zshrc, ~/.zprofile"
+echo "    fzf           ~/.config/fzfrc"
+echo "    Claude Code   ~/.config/clauderc"
+echo "    Git           ~/.gitconfig"
+echo "    Karabiner     ~/.config/karabiner/karabiner.json"
+echo "    Cursor        ~/Library/Application Support/Cursor/User/"
+echo "    Shortcuts     ~/.local/bin/keys"
+echo ""
+echo "  [カタログのみ（リンク不要）]"
+echo "    Brewfile      brew bundle --file=Brewfile で一括インストール"
+echo "    ツール一覧    docs/tools.md を参照"
+echo ""
+echo "次の手順:"
+echo "  1. シェルを再起動: exec zsh"
+echo "  2. Ghosttyを再起動して設定を反映"
+echo "  3. Karabiner-Elementsを再起動"
+echo "  4. ショートカット確認: keys"
+echo ""
