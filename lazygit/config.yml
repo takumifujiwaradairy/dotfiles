@@ -1,0 +1,7 @@
+# lazygit configuration
+# Reference: https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+
+gui:
+  language: 'auto'
+  showIcons: true
+  nerdFontsVersion: '3'

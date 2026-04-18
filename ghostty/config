@@ -15,8 +15,8 @@ window-inherit-working-directory = true
 # リサイズオーバーレイ設定
 resize-overlay = never
 
-# フォント設定（推奨）
-font-family = "JetBrains Mono"
+# フォント設定（LazyVimのアイコン表示用にNerd Font版を使用）
+font-family = "JetBrainsMono Nerd Font Mono"
 font-size = 13
 
 # その他の推奨設定
@@ -24,3 +24,18 @@ scrollback-limit = 50000
 window-padding-x = 8
 window-padding-y = 8 
 keybind = shift+enter=text:\n
+# 注: ctrl+v は Claude Code の画像貼り付け用に解放 (テキスト貼り付けは ⌘+V を使用)
+# keybind = ctrl+v=paste_from_clipboard
+
+# コピー時にHTMLを含めずプレーン文字のみにする (貼り付け先での変な空白混入を防ぐ)
+keybind = super+c=copy_to_clipboard:plain
+# Non-breaking space (U+00A0) を通常の空白 (U+0020) に変換してコピー
+clipboard-codepoint-map = U+00A0=U+0020
+
+# tmux分割ショートカット: ⌘+Shift+| で左右分割、⌘+Shift+- で上下分割
+# (tmux prefix Ctrl+a = \x01 を送ってから分割キーを送る)
+# backslash (US配列) + intl_yen / intl_ro (JIS配列) で両対応
+keybind = super+shift+backslash=text:\x01|
+keybind = super+shift+intl_yen=text:\x01|
+keybind = super+shift+intl_ro=text:\x01|
+keybind = super+shift+minus=text:\x01-

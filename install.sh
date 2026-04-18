@@ -32,6 +32,30 @@ link_file() {
     echo "  [OK] ${name}: ${dest}"
 }
 
+link_dir() {
+    local src="$1"
+    local dest="$2"
+    local name="$3"
+
+    # 親ディレクトリが存在しない場合は作成
+    mkdir -p "$(dirname "$dest")"
+
+    # 既存のディレクトリ(実体)があればバックアップ
+    if [ -d "$dest" ] && [ ! -L "$dest" ]; then
+        echo "  既存の${name}設定をバックアップ: ${dest}.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$dest" "${dest}.backup.$(date +%Y%m%d_%H%M%S)"
+    fi
+
+    # 既存のsymlinkは一旦削除(ln -sfnだとディレクトリsymlinkの更新が不安定なため)
+    if [ -L "$dest" ]; then
+        rm "$dest"
+    fi
+
+    # ディレクトリsymlinkを作成
+    ln -s "$src" "$dest"
+    echo "  [OK] ${name}: ${dest}"
+}
+
 # =============================================================================
 # ターミナル・シェル
 # =============================================================================
@@ -82,6 +106,21 @@ link_file "${DOTFILES_DIR}/karabiner/karabiner.json" \
     ~/.config/karabiner/karabiner.json \
     "Karabiner-Elements"
 
+link_file "${DOTFILES_DIR}/lazygit/config.yml" \
+    ~/.config/lazygit/config.yml \
+    "lazygit"
+
+# =============================================================================
+# エディタ (NeoVim / LazyVim)
+# =============================================================================
+
+echo ""
+echo "--- エディタ (NeoVim / LazyVim) ---"
+
+link_dir "${DOTFILES_DIR}/nvim" \
+    ~/.config/nvim \
+    "NeoVim (LazyVim)"
+
 # =============================================================================
 # エディタ (Cursor)
 # =============================================================================
@@ -110,6 +149,43 @@ mkdir -p ~/.local/bin
 link_file "${DOTFILES_DIR}/shortcuts/keys.sh" \
     ~/.local/bin/keys \
     "Shortcuts (keys)"
+
+# =============================================================================
+# Claude Code スクリーンショット自動パスコピー watcher
+# =============================================================================
+# macOSスクショ(Cmd+Shift+4)がDesktopに保存されたら、そのパスを自動で
+# クリップボードへコピーする launchd agent。
+# Claude Code では Cmd+V でパスを貼付 → Claude が画像として読む。
+
+echo ""
+echo "--- Claude Code スクリーンショット watcher ---"
+
+# TCC (macOS権限) 制約で、launchd は ~/Documents/ 配下のスクリプトを実行できない。
+# そのため symlink ではなく **copy** で ~/.local/bin/ に配置する。
+WATCHER_SRC="${DOTFILES_DIR}/scripts/claude-screenshot-watcher.sh"
+WATCHER_DEST="$HOME/.local/bin/claude-screenshot-watcher.sh"
+if [ -f "$WATCHER_SRC" ]; then
+    cp "$WATCHER_SRC" "$WATCHER_DEST"
+    chmod +x "$WATCHER_DEST"
+    echo "  [OK] Watcher script: ${WATCHER_DEST}"
+fi
+
+# launchd plist を ~/Library/LaunchAgents/ にコピー → agent をロード
+PLIST_SRC="${DOTFILES_DIR}/launchd/com.fujiwaratakumi.claude-screenshot-watcher.plist"
+PLIST_DEST="$HOME/Library/LaunchAgents/com.fujiwaratakumi.claude-screenshot-watcher.plist"
+if [ -f "$PLIST_SRC" ]; then
+    mkdir -p "$HOME/Library/LaunchAgents"
+    cp "$PLIST_SRC" "$PLIST_DEST"
+    launchctl unload "$PLIST_DEST" 2>/dev/null || true
+    launchctl load "$PLIST_DEST"
+    echo "  [OK] launchd agent: ${PLIST_DEST}"
+fi
+
+# スクショのフローティングサムネイルを無効化
+# (表示中は画像がclipboardに残り、watcherのパスコピーが上書きされる副作用回避)
+defaults write com.apple.screencapture show-thumbnail -bool false
+killall SystemUIServer 2>/dev/null || true
+echo "  [OK] スクショのフローティングサムネイルを無効化 (show-thumbnail=false)"
 
 # =============================================================================
 # Homebrew パッケージ（オプション）
@@ -151,8 +227,12 @@ echo "    fzf           ~/.config/fzfrc"
 echo "    Claude Code   ~/.config/clauderc"
 echo "    Git           ~/.gitconfig"
 echo "    Karabiner     ~/.config/karabiner/karabiner.json"
+echo "    lazygit       ~/.config/lazygit/config.yml"
+echo "    NeoVim        ~/.config/nvim (LazyVim)"
 echo "    Cursor        ~/Library/Application Support/Cursor/User/"
 echo "    Shortcuts     ~/.local/bin/keys"
+echo "    スクショwatcher  ~/.local/bin/claude-screenshot-watcher.sh"
+echo "                     (launchd: ~/Library/LaunchAgents/...)"
 echo ""
 echo "  [カタログのみ（リンク不要）]"
 echo "    Brewfile      brew bundle --file=Brewfile で一括インストール"
